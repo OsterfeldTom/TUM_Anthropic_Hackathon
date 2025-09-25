@@ -1,0 +1,2493 @@
+{
+  "name": "TUM_Anthropic",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        544
+      ],
+      "id": "a0390291-6794-4673-9a6a-5c3d3a5d9e4b",
+      "name": "Click ‘Execute workflow’ to run"
+    },
+    {
+      "parameters": {
+        "content": "## ⚡ Start here:",
+        "height": 448,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        432
+      ],
+      "id": "fac5929f-e065-4474-96b1-7bcc06834238",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        432
+      ],
+      "id": "084d56aa-d157-4964-9073-b36d9d9589c5",
+      "name": "AI Summary Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\nimport random\n\n\nconfigs = _input.all()[0].json.criteria_preferences\nweights = {}\n\nfor criterion in configs:\n  criterion_id = criterion.json.id\n  weight = criterion.json.factor\n  weights[criterion_id] = weight\n\nagent_outputs = _input.all()[1:]#[5:6]\noutput = []\n\nconf_sum = 0\nsum = 0\ndivident = 0\n\nprint(agent_outputs)\n\nfor i, item in enumerate(agent_outputs): \n  json_obj = json.loads(item.json.output)\n  criterion_id = item.json.criterion_id\n  score = json_obj['score']\n  rationale = json_obj['rationale']\n  missing_data = json_obj['missing_data']\n  evidence = json_obj['evidence']\n  confidence = json_obj['confidence']\n\n  weight = weights[criterion_id]\n  sum += score * weight\n  conf_sum += confidence * weight\n  divident += weight\n\n  item.json.score = score\n  item.json.confidence = confidence\n  item.json.rationale = rationale\n  item.json.missing_data = missing_data\n  item.json.evidence = evidence\n  output.append(item)\n\navg = sum / divident\navg_conf = conf_sum / divident\n  \noutput.append({'total_score':sum, 'avg' : avg, 'avg_conf' : avg_conf})\n\nreturn {\"output\":output}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        560
+      ],
+      "id": "c89fc156-f54b-42f4-9fe0-e805f55a7779",
+      "name": "Code in Python (Beta)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        608
+      ],
+      "id": "35f33359-683b-4b22-a949-ad7f079bedb4",
+      "name": "AI Summary Agent1",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-3-5-haiku-20241022",
+          "mode": "list",
+          "cachedResultName": "Claude Haiku 3.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -960,
+        2128
+      ],
+      "id": "499962d7-50b2-4361-bac4-515d13a38c66",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "TQ1OPIyzMmbUTaks",
+          "name": "Anthropic account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        800
+      ],
+      "id": "06868e3c-3bf9-4f6c-9e3a-7d748d59001e",
+      "name": "AI Summary Agent2",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        592,
+        544
+      ],
+      "id": "2a464990-facf-4b3b-9905-b7243281272a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "numberInputs": 10
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        688
+      ],
+      "id": "df53cd15-8dea-41ff-a5ad-057796758b84",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        448
+      ],
+      "id": "8475a42e-a0e9-4db5-a0ff-056435034f13",
+      "name": "Code in Python (Beta)1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = []\n\nfor item in _input.all():\n  output.append(item)\n\nreturn [{\"criteria_preferences\": output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        336
+      ],
+      "id": "d46d3a08-0646-4bb5-ad6e-95eb4375efdc",
+      "name": "Code in Python (Beta)4"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "criteria_preferences"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        592,
+        336
+      ],
+      "id": "11ef5be3-5f20-4608-8ab4-87c11f66780f",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "My2lbCWSi820IHby",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        432
+      ],
+      "id": "3f9a94a3-1540-4939-9ada-a8bd8145edb1",
+      "name": "Code in Python (Beta)5"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        608
+      ],
+      "id": "34542cfc-a0d1-44d7-beff-9c0668e68bf0",
+      "name": "Code in Python (Beta)6"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        800
+      ],
+      "id": "c6c25445-ba94-4d16-a167-71a9cb256ef8",
+      "name": "Code in Python (Beta)7"
+    },
+    {
+      "parameters": {
+        "path": "5d58a52b-04f7-47c9-adc8-f79b0b8ae614",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1664,
+        688
+      ],
+      "id": "225cf42a-08d7-43d5-8a52-55105dce353e",
+      "name": "Webhook1",
+      "webhookId": "5d58a52b-04f7-47c9-adc8-f79b0b8ae614"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.query.pdf_url_with_token }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1488,
+        688
+      ],
+      "id": "c7d689fa-07f8-46c3-a050-bf3cae95408a",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7Hn6T1b7xiRob1mP",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        448
+      ],
+      "id": "c9ac2d94-c9d9-4808-9b59-ceb0c94b2936",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        608
+      ],
+      "id": "1bb84280-a98f-4919-96e7-907f7d8fd158",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "url": "=https://nnvnymecgvnfhsujtzfy.supabase.co/storage/v1/object/sign/research-papers/public/870ffdc8-c316-461e-92a7-0cec77a9b348/bse0600381.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iZDM1NTNmMC1jNzczLTRkNGUtYjhkNC03YmZjOTZiYjQzZjIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJyZXNlYXJjaC1wYXBlcnMvcHVibGljLzg3MGZmZGM4LWMzMTYtNDYxZS05MmE3LTBjZWM3N2E5YjM0OC9ic2UwNjAwMzgxLnBkZiIsImlhdCI6MTc1ODgxMTc4NCwiZXhwIjoxNzU4ODE1Mzg0fQ.vwNgOLwkEd7vpYFcL_VinhQDAdxsxz4qGvEt_L0uP9g",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1488,
+        448
+      ],
+      "id": "1be4584b-02a7-4c0a-9a24-5e9523f2b284",
+      "name": "HTTP Request4",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7Hn6T1b7xiRob1mP",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        976
+      ],
+      "id": "8040a764-5349-4af7-9504-c10f8b1a6e56",
+      "name": "AI Summary Agent3",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1152
+      ],
+      "id": "a5f6616d-ce8c-4adc-b193-b0eee87d3a2a",
+      "name": "AI Summary Agent4",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1344
+      ],
+      "id": "0e152b7d-bc33-4c62-b7aa-b4412120c9a1",
+      "name": "AI Summary Agent5",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        976
+      ],
+      "id": "0b79058d-87ba-460b-b6ef-745fcb108688",
+      "name": "Code in Python (Beta)8"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1152
+      ],
+      "id": "79e50693-9648-4543-aabb-0c26343e6cad",
+      "name": "Code in Python (Beta)9"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1344
+      ],
+      "id": "c64d4d1c-9472-4130-aebb-6121ffc3935c",
+      "name": "Code in Python (Beta)10"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1552
+      ],
+      "id": "0d3f3907-573d-4533-953a-014c1cc3ddb5",
+      "name": "AI Summary Agent6",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1728
+      ],
+      "id": "c66febdf-766d-4aa7-a7cf-a1719184df19",
+      "name": "AI Summary Agent7",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1920
+      ],
+      "id": "579fb6a3-6fa4-4f18-a9cc-b3f661f20487",
+      "name": "AI Summary Agent8",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1552
+      ],
+      "id": "28422bfb-a2ea-42c9-8260-0eedfdbcd602",
+      "name": "Code in Python (Beta)11"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1728
+      ],
+      "id": "4818433d-ebc3-4373-b4e3-deb6eb5bc56e",
+      "name": "Code in Python (Beta)12"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        1920
+      ],
+      "id": "c5d1ef5f-7479-440c-a2b9-50d42ac2da57",
+      "name": "Code in Python (Beta)13"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        2112
+      ],
+      "id": "af1f49e5-ae95-4cea-8107-72904f2bb35f",
+      "name": "AI Summary Agent9",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        2112
+      ],
+      "id": "d9f04139-5ee3-43f7-81f3-d7b910b380fa",
+      "name": "Code in Python (Beta)14"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "format_instructs",
+              "value": "EXTREMELY IMPORTANT, FOR YOUR FINAL ANSWER ONLY USE THIS FORMAT. DO NOT PROVIDE EXTRA INFORMATION, ONLY GIVE THE JSON AS OUTPUT! Do not invent facts. Base evaluation only on deck content.  Important, return your evaluation using the following format: {\"score\": integer, \"confidence\": float, \"rationale\": string, \"evidence\": string, \"missing_data\": string} (do not start with ````json) confidence is a score between 0 and 1. Here is an example output: \n\"{\\n    \\\"score\\\": 3,\\n    \\\"confidence\\\": 0.7,\\n    \\\"rationale\\\": \\\"Academic researchers with multi-institutional expertise, but unclear commercial/startup experience\\\", \\n    \\\"evidence\\\": \\\"Authors from UCL, University of Aberdeen, and Lobachevsky State University with diverse backgrounds in biochemical engineering, mathematics, physics, and control systems\\\",\\n    \\\"missing_data\\\": \\\"No evidence of startup founding, commercial venture experience, or technology transfer credentials\\\"\\n}\"\nIt is super important that you only return the json construct and not any additional text. For example, do NOT start with something like: \"Based on the research paper, here's the team strength evaluation\". READ THROUGH THE TEXT AGAIN AND REMEMBER THE OUTPUT FORMAT INSTRUCTIONS",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1056,
+        896
+      ],
+      "id": "8f0e25f7-5016-4b2d-b39a-b50ecdeef51b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        624
+      ],
+      "id": "e708527b-61d7-4341-b896-f6eb49220835",
+      "name": "Code in Python (Beta)15"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        800
+      ],
+      "id": "38671b41-d396-4048-a18d-d7214b042e8e",
+      "name": "Code in Python (Beta)16"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        992
+      ],
+      "id": "158539d2-db0e-4a50-a9b9-7cb06ed1b50e",
+      "name": "Code in Python (Beta)17"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        1168
+      ],
+      "id": "057dfd43-6703-4dbe-a705-19ec7cafc7ea",
+      "name": "Code in Python (Beta)18"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        1360
+      ],
+      "id": "82f9520e-e9ff-44e6-a211-93f032d06385",
+      "name": "Code in Python (Beta)19"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        1568
+      ],
+      "id": "51226cb8-21fb-4738-b6ed-c90fddc000c2",
+      "name": "Code in Python (Beta)20"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        1744
+      ],
+      "id": "cfe1b8dd-3298-4cd9-9838-37166456819d",
+      "name": "Code in Python (Beta)21"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        1936
+      ],
+      "id": "deeccc2d-15b1-408b-bc88-fe8704d285af",
+      "name": "Code in Python (Beta)22"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        2128
+      ],
+      "id": "92dd10ca-3dfb-48d9-8f2b-98f676f2baab",
+      "name": "Code in Python (Beta)23"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version of your prompt:\n\n⸻\n\nYou are an expert research evaluator specializing in assessing originality and differentiation in academic papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Originality & Differentiation of the work.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Radically new idea, no close alternatives.\n2 = Strong novelty, few similar works.\n3 = Builds on existing work but moderately new.\n4 = Incremental improvement, overlaps heavily.\n5 = Minimal originality, no clear differentiation.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Originality & Differentiation.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification that explains what is novel in content terms (do not merely repeat authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 7”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., clearer comparison to prior work, ablation showing uniqueness, formal proof of novelty)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tClaimed novel contributions vs. prior work (Related Work section, contribution bullets)\n\t•\tNew theory/algorithm/method, task, dataset, or benchmark\n\t•\tProprietary or IP claims (patents/disclosures) if present\n\t•\tMarket/knowledge gap or problem framing that is distinct from existing literature\n\t•\tComparisons to existing methods (qualitative and quantitative) that demonstrate differentiation\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tDo not rely on novelty claims alone; justify based on concrete methodological, theoretical, or empirical differences described in the text.\n\t•\tIf the paper lacks explicit comparisons or detail needed to judge novelty, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        448
+      ],
+      "id": "08248696-2770-423f-ae56-e97c941f01ce",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert technical due-diligence analyst specializing in evaluating technology readiness and feasibility in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Technical Feasibility of the proposed solution.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Strong experimental evidence; reproducible results and working prototype/implementation described.\n2 = Clear technical path; most hurdles addressed with credible methods or prior validation.\n3 = Feasible but key unknowns remain (e.g., scalability, edge cases, resource needs).\n4 = Mostly speculative; limited validation or unclear path to implementation.\n5 = Highly speculative; no credible path to feasibility presented.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Technical Feasibility.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s technical content (not just the authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 4, p. 12”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., implementation details, scalability tests, ablations, safety/reliability analysis)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tDevelopment stage: concept vs. implemented method, prototype, open-source code, hardware build, or real-world deployment details\n\t•\tTechnical milestones achieved: benchmarks met, performance vs. baselines, system integrations\n\t•\tScientific validation or pilot results: experimental setup, datasets, metrics, statistical rigor, ablations\n\t•\tTechnical team expertise: author affiliations, prior related work cited as capability signals\n\t•\tR&D roadmap clarity: future work/path to deployment, dependency on external advances (data, compute, materials)\n\t•\tKey technical risks addressed: safety, reliability, scalability, cost/energy constraints, compliance\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tDo not rely on assertions alone—justify feasibility using concrete methods, results, and implementation details.\n\t•\tIf the paper lacks information needed to judge feasibility, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        640
+      ],
+      "id": "361705be-6cee-4699-bbb3-8864190e1d7d",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert growth strategist specializing in evaluating scalability potential in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Scalability of the proposed approach/system.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Globally scalable across domains and settings with minimal adaptation.\n2 = Broad adoption possible within large sectors/regions; moderate adaptation needed.\n3 = Applicable to a few domains/tasks; notable constraints limit wider use.\n4 = Suited mainly to small or niche contexts; significant barriers to scale.\n5 = Very narrow applicability; no credible path to scale.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Scalability.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not author hype)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 5, p. 14”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., cross-domain evals, cost/latency benchmarks, deployment case studies)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tAddressable scope: tasks/domains where the method is applicable; evidence of cross-domain generalization\n\t•\tGeographic/deployment breadth: feasibility across regions/infrastructures (cloud/on-prem/edge)\n\t•\tVertical applicability: adaptability to multiple industries or datasets/benchmarks\n\t•\tGrowth mechanics: network effects, data network effects, platform extensibility, ecosystem readiness\n\t•\tUnit economics at scale: compute/storage/latency/energy needs; throughput; OPEX/CAPEX implications\n\t•\tPlatform vs. point solution: modularity, APIs, standard compliance, interoperability\n\t•\tBarriers to scale: specialized hardware, scarce data, regulatory/safety constraints, operational complexity\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tFavor concrete scalability evidence (e.g., large-scale experiments, ablations on resource use, cross-dataset results) over claims.\n\t•\tIf key details for judging scalability are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        816
+      ],
+      "id": "c712a852-b768-4446-bba8-4f01dfeefc9d",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert market analyst specializing in evaluating market opportunity and timing in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate Market Attractiveness & Timing for the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Clear demand and strong timing evidenced in the paper (e.g., pilots/user studies, partner interest, compelling tailwinds).\n2 = Demand visible; timing good with credible enablers or early validation.\n3 = Potential demand but timing uncertain; limited or indirect validation.\n4 = Weak/unclear demand; mostly theoretical interest with scant application evidence.\n5 = No visible market or application context presented.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Market Attractiveness & Timing.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not just author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 2, p. 5”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., TAM/CAGR estimates, user willingness-to-pay, regulatory status, deployment cost curves)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tMarket size & growth cited in the paper (TAM/SAM/SOM, CAGR)\n\t•\tPain-point urgency and problem criticality for intended users/sectors\n\t•\tTrends & tailwinds (technological, regulatory, or infrastructure enablers)\n\t•\tCustomer/partner validation (LOIs, pilots, field trials, revenue/usage signals)\n\t•\tCompetitive landscape maturity and differentiation relevance to buyers\n\t•\tWhy now vs. why not before (new capabilities, costs, regulation)\n\t•\tBarriers that could delay timing (regulatory hurdles, data access, deployment constraints)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete in-paper evidence (empirical results, case studies, stated partners) over speculative language.\n\t•\tIf crucial market/timing details are missing, lower confidence and fill enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        992
+      ],
+      "id": "e0e563cf-7fcf-417a-9d85-9b8a17e7cbb6",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert competitive strategy analyst specializing in evaluating sustainable competitive advantages in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Competitive Advantage of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Unique IP/know-how or defensible assets; hard to replicate.\n2 = Strong protection/barriers (credible moat, partial replication possible).\n3 = Some edge but reasonably replicable with effort.\n4 = Weak differentiation; easy to copy.\n5 = No visible advantage.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Competitive Advantage.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification grounded in the paper’s content (what makes it defensible, not just authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 8”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., IP status, dataset licensing, reproducibility limits, exclusive access)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tPatents, disclosures, trade secrets, or proprietary methods/code/datasets\n\t•\tData moats (exclusive data access, long-tail annotations, unique pipelines) and network effects\n\t•\tSwitching costs / lock-in (standards integration, ecosystem dependencies, proprietary formats/APIs)\n\t•\tFirst-mover or standard-setting advantages (benchmarks, community adoption, citations)\n\t•\tExclusive partnerships or restricted resources (hardware, compute credits, consortia, field sites)\n\t•\tTeam’s distinctive expertise or prior art indicating execution advantage\n\t•\tRegulatory barriers/certifications or compliance capabilities that are hard to match\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete, verifiable defenses (IP filings, non-public data, reproducibility limits, ablations showing sensitivity to secret components) over generic claims.\n\t•\tIf crucial details are missing to judge defensibility, lower confidence and fill enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        1168
+      ],
+      "id": "e985b8f0-2b9b-416f-8092-62eb9a9c51a8",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert impact assessment analyst specializing in evaluating economic and societal benefits in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Economic & Societal Impact of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Transformative global benefits with credible evidence or pathway.\n2 = Major benefits in large sectors/regions with supportive evidence.\n3 = Moderate benefits; promising signals but limited scope or validation.\n4 = Small/local impact; weak or anecdotal evidence.\n5 = Minimal impact; no compelling benefits described.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Economic & Societal Impact.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (explain why the impact is at this level, not just the authors’ claim)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 6, p. 18”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., LCA results, cost–benefit/TCO analysis, RCT or field trial outcomes, adoption studies)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tJob creation / productivity effects or projected employment impacts\n\t•\tEnvironmental benefits / sustainability (e.g., lifecycle assessment, emissions/energy/waste reductions)\n\t•\tHealthcare or quality-of-life improvements (clinical/field evidence, safety outcomes)\n\t•\tCost savings for industries, institutions, or consumers (CAPEX/OPEX, TCO)\n\t•\tAccessibility / democratization (low-cost design, low-resource deployment, open tools)\n\t•\tUN SDG alignment explicitly stated or inferable from objectives\n\t•\tEconomic value creation estimates (market efficiencies, GDP/sector gains, welfare impacts)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete, measurable impact evidence (studies, pilots, quantified deltas) over aspirational language.\n\t•\tIf impact/timing data are missing or speculative, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        1360
+      ],
+      "id": "95bada1d-8ce7-4427-a57b-da5c862d46ca",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert product development analyst specializing in evaluating time-to-deployment timelines in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Time to Market / Practical Deployment of the proposed technology.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = 3–5 years to deployment.\n2 = 5–7 years.\n3 = 7–10 years.\n4 = 10–15 years.\n5 = 15+ years.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Time to Market / Practical Deployment.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not just author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 4, p. 12”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., regulatory pathway, pilot schedule, manufacturing scale-up plan)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tCurrent development stage / TRL: concept vs. prototype, implementation details, code/hardware availability\n\t•\tRoadmap & milestones stated in “Future Work” or deployment sections\n\t•\tRegulatory approvals / standards compliance relevant to the domain (e.g., medical, safety, data privacy)\n\t•\tManufacturing or scale-up timeline (supply chain, facilities, specialized materials)\n\t•\tBeta testing / pilot programs: scope, duration, and required resources\n\t•\tDeployment or commercialization timeline if discussed (e.g., planned trials, partner timelines)\n\t•\tIndustry-specific development cycles and dependencies (data, compute, certifications)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (working prototype, scheduled pilots, stated regulatory plan) over aspirational language.\n\t•\tIf key timeline details are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        1568
+      ],
+      "id": "2729299f-d90e-4223-937b-7d0c5f324c88",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert talent assessment specialist focusing on evaluating founding-team strength in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Team Strength behind the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = World-class, entrepreneurial, proven track record (spin-outs, deployments, notable awards).\n2 = Strong team with translational experience (industry collaborations, pilots, open-source adoption).\n3 = Good domain expertise but limited commercial/venture experience.\n4 = Weak execution capacity (narrow skills, unclear ownership, limited applied outcomes).\n5 = No credible team evidence.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Team Strength.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on concrete content (explain why the team merits this score; avoid parroting author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Author info, p. 2”; “Acknowledgments, Sec. 8, p. 17”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list missing data if confidence is 3–5 (e.g., author bios, prior startups, commercialization history, GitHub links)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tPrior startup/exit or spin-out experience mentioned in the paper (e.g., disclosures, conflicts of interest).\n\t•\tDomain expertise & years of experience (senior PI status, key prior publications, industrial lab affiliations).\n\t•\tBalance of skills relevant to translation (methods/engineering, product, regulatory/clinical/domain experts).\n\t•\tAdvisory board / collaborators (industry partners, hospitals, standards bodies, consortia).\n\t•\tTeam completeness vs. gaps (manufacturing, data, safety, compliance).\n\t•\tAcademic/industry credentials & achievements (best paper awards, benchmarks, deployments, grants).\n\t•\tPast performance signals (real-world pilots, open-source adoption, citation/benchmark leadership noted in paper).\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tFavor concrete signals (deployments, disclosed partnerships, maintained code/artifacts) over generic statements.\n\t•\tIf team details are sparse, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        1744
+      ],
+      "id": "9e61a1d6-d9f7-4ae5-98aa-29b410f89582",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert risk assessment analyst specializing in evaluating risk–return profiles in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Risk vs. Return profile of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = High technical/translation risk with transformative upside if successful.\n2 = Medium–high risk with strong potential upside.\n3 = Balanced profile: moderate risks with modest upside.\n4 = Low risk but limited upside.\n5 = Poor balance (significant risks with little credible upside).\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Risk vs. Return.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification grounded in the paper’s content (explain why this risk–return balance holds; avoid parroting claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 8”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., cost model, risk register, sensitivity analysis, regulatory mapping)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tApplication breadth vs. execution complexity (deployment settings, dependencies, required breakthroughs)\n\t•\tResource/capital requirements vs. potential benefits (compute, data, lab equipment, manufacturing, OPEX/CAPEX)\n\t•\tTechnical risk vs. opportunity size (scalability limits, robustness, generalization vs. addressable problem impact)\n\t•\tAlternative methods/competition risk vs. differentiation (baselines, ablations, unique capabilities)\n\t•\tRegulatory/safety/privacy risks vs. market access or adoption pathways\n\t•\tTranslation/exit potential analogs (prior deployments, standardization prospects, ecosystem fit)\n\t•\tCapital efficiency metrics/proxies (cost per inference/experiment, training/runtime budgets, throughput/energy)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (quantified results, cost/performance analyses, explicit risk discussions) over aspirational language.\n\t•\tIf critical inputs to judge risk or upside are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        1936
+      ],
+      "id": "6640b829-b5c3-4790-8a0f-4e267447bea7",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert European venture strategist specializing in evaluating strategic importance for EU/German competitiveness and sovereignty in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Strategic Fit for EU/Germany of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Critical for EU sovereignty/competitiveness.\n2 = Major relevance.\n3 = Some relevance.\n4 = Minor relevance.\n5 = No relevance.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Strategic Fit (EU/Germany).\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (explain why it matters for EU/Germany; don’t just repeat author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 2, p. 5”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., EU location of labs, supply-chain reliance, regulatory alignment)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tAlignment with EU initiatives (e.g., Green Deal, Digital Strategy, Chips/AI/Net-Zero Acts) explicitly discussed in the paper\n\t•\tReduced dependency on non-EU suppliers (materials, data, compute, tooling)\n\t•\tStrengthening key European industries (automotive, health, energy, semiconductors, aerospace, manufacturing)\n\t•\tCreation of high-skilled EU jobs or capability building (labs, centers, training)\n\t•\tDeep-tech/frontier areas with strategic value (semis, AI, robotics, biotech, quantum, advanced materials)\n\t•\tDual-use/defense relevance or standards/critical infrastructure implications\n\t•\tEU/German presence: author affiliations, EU grants (e.g., Horizon Europe), EU-based datasets/testbeds, consortia participation\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (EU funding acknowledgments, EU partners, standards compliance, EU-specific use cases) over general statements.\n\t•\tIf the paper lacks EU/Germany context, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        2128
+      ],
+      "id": "e43c5f12-e01f-46ac-bc0c-4bf02a7e69b9",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        432
+      ],
+      "id": "c2e50ede-c58e-4fbf-ba75-d39e72b8aacb",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        624
+      ],
+      "id": "e8a7815d-4dc8-4cb6-bfde-f60e842ce19e",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        800
+      ],
+      "id": "c52eb1a0-6b5b-447e-89cc-cda25983a0a4",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        976
+      ],
+      "id": "56e0ded3-ef66-45d5-90fa-cff1b0fa7009",
+      "name": "Merge6"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        1152
+      ],
+      "id": "70a99a21-e9d9-48bd-bbda-c5fbd2759984",
+      "name": "Merge7"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        1344
+      ],
+      "id": "c13b16cb-1a41-418d-a657-6bcb0a44da73",
+      "name": "Merge8"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        1552
+      ],
+      "id": "5f21fef8-2bd5-4bcd-92df-f47c5caa69db",
+      "name": "Merge10"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -496,
+        1920
+      ],
+      "id": "f728ebe9-de8e-49e5-9c41-482337e9bb1e",
+      "name": "Merge11"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -496,
+        2112
+      ],
+      "id": "7440125b-1091-48b6-be44-c7a2f3586f35",
+      "name": "Merge12"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        576
+      ],
+      "id": "4ff103c5-26e0-4d8f-959d-9c9daf08a983",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        1728
+      ],
+      "id": "f44efbdd-2076-458b-afc7-32b188a29d68",
+      "name": "Merge9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nnvnymecgvnfhsujtzfy.supabase.co/functions/v1/insert-criteria-score",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "missing_data",
+              "value": "={{ $json.json.missing_data }}"
+            },
+            {
+              "name": "confidence",
+              "value": "={{ $json.json.confidence }}"
+            },
+            {
+              "name": "evidence",
+              "value": "={{ $json.json.evidence }}"
+            },
+            {
+              "name": "rationale",
+              "value": "={{ $json.json.rationale }}"
+            },
+            {
+              "name": "confidence",
+              "value": "={{ $json.json.confidence }}"
+            },
+            {
+              "name": "score",
+              "value": "={{ $json.json.score }}"
+            },
+            {
+              "name": "criterion_id",
+              "value": "={{ $json.json.criterion_id }}"
+            },
+            {
+              "name": "raw",
+              "value": "={{ $json.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        448
+      ],
+      "id": "c392ec62-de20-4814-8b96-fdb2f4dd64a4",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "tableId": "potentials",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "application_id",
+              "fieldValue": "={{ $('Webhook1').first().json.query.application_id }}"
+            },
+            {
+              "fieldId": "avg_score",
+              "fieldValue": "={{ $json.output[9].avg }}"
+            },
+            {
+              "fieldId": "overall_confindence",
+              "fieldValue": "={{ $json.output[9].avg_conf }}"
+            },
+            {
+              "fieldId": "progress_stage",
+              "fieldValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        640
+      ],
+      "id": "468e9ef9-471d-4114-8aee-2248399fd284",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "My2lbCWSi820IHby",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.logic-mill.net/api/v1/graphql/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJBUEkiLCJleHAiOjI2Mjk2NDA3MDQsImlhdCI6MTc1ODcyODcwNCwiaXNzIjoiTE9HSUMtTUlMTCIsImp0aSI6IjAxZjNkZmMzLTRkMzgtNDg4ZS04MGRmLTZiMTdhYjE3NjEzZSIsIm5iZiI6MTc1ODcyODcwNCwicGF5bG9hZCI6eyJ0b2tlbk5hbWUiOiJEZWZhdWx0IEFQSSBUb2tlbiJ9LCJzdWIiOiJhNjAxMDk4Mi00ZDJjLTRlOWMtYjlkMi0yMmRiOTQ1YTZmNDUifQ.tT5RvHuLuxs-EB5s93W-6ZScIzRFUbYD0izKQqHSlus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query embedDocumentAndSimilaritySearch($data: [EncodeDocumentPart], $indices: [String], $amount: Int, $model: String!) { encodeDocumentAndSimilaritySearch(data: $data, indices: $indices, amount: $amount, model: $model) { id score index document { title url publicationDate isParatext isRetracted} } }\",\n  \"variables\": {\n    \"model\": \"patspecter\",\n    \"data\": [\n      { \"key\": \"title\", \"value\": \"{{ $json.research_title }}\" },\n      { \"key\": \"abstract\", \"value\": \"{{ $json.abstract }}\" }\n    ],\n    \"amount\": 500,\n    \"indices\": [\"publications\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -704,
+        256
+      ],
+      "id": "77a91a55-1c30-49d6-be21-185e34db0b43",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23ec9f31-ee9e-4198-b947-e963deea8c60",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isParatext }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "94c31ed8-1f99-4df2-aca4-edf835c44b2f",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isRetracted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "08deac26-b701-47cc-b5ac-066d3aeca2c0",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].score }}",
+              "rightValue": 0.98,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        64
+      ],
+      "id": "83830188-ef75-4844-9629-54b5d178618b",
+      "name": "Filter4",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Grab the first item\nitem = _input.all()[0]\nif not items or not item[\"json\"] or not item[\"json\"].get(\"data\"):  # nothing came in at all, or no 'data' key\n    return [{\"json\": {\"score\": 5, \"count\": 0}}]\n\n# Navigate into the nested structure\ncount = len(item[\"json\"][\"data\"][\"encodeDocumentAndSimilaritySearch\"])\n# Discrete, explainable mapping from hit count -> score 1..5 (5 = most novel).\nprint(count)\nbins = (1, 15, 50, 100)\nb1, b2, b3, b4 = bins\nif count <= b1:\n    score = 1\nelif count <= b2:\n    score = 2\nelif count <= b3:\n    score = 3\nelif count <= b4:\n    score = 4\nelse:\n    score = 5\n\n# Return array of dictionaries, as expected by n8n\nreturn [{\"json\": {\"score\": score, \"count\": count}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        64
+      ],
+      "id": "e98bf948-ee9b-4995-972d-a8ec3da153bf",
+      "name": "Code in Python (Beta)27",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.logic-mill.net/api/v1/graphql/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJBUEkiLCJleHAiOjI2Mjk2NDA3MDQsImlhdCI6MTc1ODcyODcwNCwiaXNzIjoiTE9HSUMtTUlMTCIsImp0aSI6IjAxZjNkZmMzLTRkMzgtNDg4ZS04MGRmLTZiMTdhYjE3NjEzZSIsIm5iZiI6MTc1ODcyODcwNCwicGF5bG9hZCI6eyJ0b2tlbk5hbWUiOiJEZWZhdWx0IEFQSSBUb2tlbiJ9LCJzdWIiOiJhNjAxMDk4Mi00ZDJjLTRlOWMtYjlkMi0yMmRiOTQ1YTZmNDUifQ.tT5RvHuLuxs-EB5s93W-6ZScIzRFUbYD0izKQqHSlus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query embedDocumentAndSimilaritySearch($data: [EncodeDocumentPart], $indices: [String], $amount: Int, $model: String!) { encodeDocumentAndSimilaritySearch(data: $data, indices: $indices, amount: $amount, model: $model) { id score index document { title url publicationDate isParatext isRetracted} } }\",\n  \"variables\": {\n    \"model\": \"patspecter\",\n    \"data\": [\n      { \"key\": \"title\", \"value\": \"{{ $json.research_title }}\" },\n      { \"key\": \"abstract\", \"value\": \"{{ $json.abstract }}\" }\n    ],\n    \"amount\": 500,\n    \"indices\": [\"patents\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -704,
+        64
+      ],
+      "id": "2a7590fc-93f9-4c1e-8748-2af9cf733f99",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23ec9f31-ee9e-4198-b947-e963deea8c60",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isParatext }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "94c31ed8-1f99-4df2-aca4-edf835c44b2f",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isRetracted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "08deac26-b701-47cc-b5ac-066d3aeca2c0",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].score }}",
+              "rightValue": 0.98,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -512,
+        256
+      ],
+      "id": "262cdd6c-4e12-42d1-9f70-96462e92e45f",
+      "name": "Filter5",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -128,
+        144
+      ],
+      "id": "9b9c70e6-efe8-44bb-a220-5b3a8ce632d7",
+      "name": "Merge14"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Grab the first item\nitem = _input.all()[0]\n\nitem = _input.all()[0]\nif not items or not item[\"json\"] or not item[\"json\"].get(\"data\"):  # nothing came in at all, or no 'data' key\n    return [{\"json\": {\"score\": 5, \"count\": 0}}]\n\n\n# Navigate into the nested structure\ncount = len(item[\"json\"][\"data\"][\"encodeDocumentAndSimilaritySearch\"])\n\n# Discrete, explainable mapping from hit count -> score 1..5 (5 = most novel).\nbins = (1, 5, 15, 35)\nb1, b2, b3, b4 = bins\nif count <= b1:\n    score = 5\nelif count <= b2:\n    score = 4\nelif count <= b3:\n    score = 3\nelif count <= b4:\n    score = 2\nelse:\n    score = 1\n\n# Return array of dictionaries, as expected by n8n\nreturn [{\"json\": {\"score\": score, \"count\": count}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        256
+      ],
+      "id": "a8e54dfc-18e3-4600-aa50-ae129c4962b0",
+      "name": "Code in Python (Beta)28"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n# Loop over input items and add a new field called 'myNewField' to the JSON of each one\ninput = _input.all()\n\npatents_score = items[0][\"json\"][\"score\"]\npublications_score = items[1][\"json\"][\"score\"]\nfinal_score = int(((patents_score * 4) + publications_score) /5)\nif final_score == 1:\n  rational = \"This idea appears highly novel, with no or almost no closely related patents or publications found.\"\nelif final_score == 2:\n  rational = \"This idea shows limited overlap with existing work, suggesting it introduces concepts not widely explored.\"\nelif final_score == 3:\n  rational = \"This idea has some similarities to existing research or patents, but still shows a degree of originality.\"\nelif final_score == 4:\n  rational = \"This idea overlaps strongly with established work, indicating it is less original and likely builds on existing concepts.\"\nelse:\n  rational = \"This idea is highly similar to many existing patents or publications, suggesting it is not novel.\"\n\nreturn [{\"json\": {\"output\" : json.dumps({\"score\": final_score, \"confidence\": 0.64, \"rationale\": rational, \"evidence\": \"Max Planck Similarity Search (Logic Mill Database)\", \"missing_data\":\"no data is missing\"}, indent=2), \"criterion_id\":\"5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817\"}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        144
+      ],
+      "id": "7c4e94e3-db7c-480b-b5c6-197cf504f7ec",
+      "name": "Code in Python (Beta)29"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "applications",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.query.application_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        176
+      ],
+      "id": "87096772-c5d1-464a-9e68-1ce656d8a664",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DrwIj6j57cZRH44s",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return _input.all()[0]['json']['output'][:-1]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        448
+      ],
+      "id": "fc0eedc1-c550-4221-81ae-d1f4a370c66b",
+      "name": "Code in Python (Beta)2"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return {\"output\":_input.all()}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        448
+      ],
+      "id": "da1d0774-8f44-438e-9e6d-58c7fbecb682",
+      "name": "Code in Python (Beta)3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Click ‘Execute workflow’ to run": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Summary Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent6",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent7",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent8",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Summary Agent9",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in Python (Beta)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)7": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)6": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent4": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent5": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent6": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent7": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent8": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary Agent9": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)8": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)9": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)10": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)11": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)12": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)13": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)14": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 9
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)1": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)15": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)16": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)17": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)18": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)19": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)20": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)21": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)22": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)23": {
+      "main": [
+        [
+          {
+            "node": "AI Summary Agent9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge7",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge10",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge9",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge11",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge12",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        [
+          {
+            "node": "Merge12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "Merge11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Merge9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Merge10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Merge7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Operation, do nothing": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge6",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge7",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge10",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge9",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge11",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge12",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge6": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge7": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge8": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge10": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge9": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge11": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge12": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        []
+      ]
+    },
+    "Create a row": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Filter5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter4": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)27",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)27": {
+      "main": [
+        [
+          {
+            "node": "Merge14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Filter4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter5": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)28",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge14": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)29",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)28": {
+      "main": [
+        [
+          {
+            "node": "Merge14",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)2": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)29": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)3": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "8166cc9f-ec23-45c2-8790-6942a822d705",
+  "meta": {
+    "templateId": "ready-to-run-ai-workflow-v2",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc590e9501edc608182b5ddca78173b81472dc2c1b497a478f2c4c498d88f5ef"
+  },
+  "id": "Yhfyuw7jrZsstfY0",
+  "tags": []
+}
