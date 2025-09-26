@@ -1,5 +1,15 @@
 ## Story 
 
+### 🚀 Analysa — An AI-Powered Research Innovation Assessment Platform
+Analysa is an AI-driven platform designed to evaluate the breakthrough potential of research ideas and scientific papers. It enables research institutions, innovation analysts, and funding organizations to identify high-impact, high-novelty innovations faster and more accurately.
+
+
+### How It Works
+1. Upload Research — Add a research paper, abstract, or proposal
+2. Analysa performs an automated assessment of breakthrough innovation potential by evaluating key criteria such as empirical novelty analysis (based on patents and publications), feasibility, scalability, and many more dimensions as described below.
+Get Insights
+3. Receive a detailed report with scores, recommendations, and potential classification
+
 
 ## Demo
 
