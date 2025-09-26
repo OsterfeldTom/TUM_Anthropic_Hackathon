@@ -46,7 +46,7 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
 
 ## Demo
 
- video
+ See video
  
 ## Tech Stack
 
@@ -54,8 +54,8 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
   ![Workflow Architecture in n8n ](resources/n8n_workflow.png)
 
 - ### Web interface - Lovable
-    link to website
-  see video presentation and code
+  Link to website: https://startup-grader.lovable.app
+  For further insights see code or video demo
 
 - ### Backend - Supabase
     <img src="resources/database_scheme_supabase.jpg" width="800" />
