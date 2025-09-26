@@ -1,0 +1,4 @@
+project_id = "nnvnymecgvnfhsujtzfy"
+
+[functions.insert-criteria-score]
+verify_jwt = false
