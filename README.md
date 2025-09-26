@@ -49,14 +49,14 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
 ## Tech Stack
 
 - ### Workflow Management - n8n
-  ![Workflow Architecture in n8n ](images/n8n_workflow.png)
+  ![Workflow Architecture in n8n ](resources/n8n_workflow.png)
 
 - ### Web interface - Lovable
     link to website
   see video presentation and code
 
 - ### Backend - Supabase
-    <img src="images/database_scheme_supabase.jpg" width="800" />
+    <img src="resources/database_scheme_supabase.jpg" width="800" />
     
 - ### Additional Logic - Claude API
   
