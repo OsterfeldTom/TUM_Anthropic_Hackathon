@@ -44,22 +44,24 @@ Criteria 1, the novelty assessment is based on an empirical evauluation by acces
 The assessment of the criteria 2 - 10 is done by a claude agents.
 
 
-## Architecture
-
-- ### Web interface - Lovable
-  short description
+## Tech Stack
 
 - ### Workflow Management - n8n
-  short description
+  ![Workflow Architecture in n8n ](images/n8n_workflow.png)
+
+- ### Web interface - Lovable
+    link to website
+  see video presentation and code
+
 - ### Backend - Supabase
-  short description
+    <img src="images/database_scheme_supabase.jpg" width="800" />
+    
 - ### Additional Logic - Claude API
-  short description
-- ### interview - elevenlabs
-  short description
-- ### video avatar - beyondpresence
-  short description
-![Workflow Architecture in n8n ](images/n8n_workflow.png)
+  
+- ### Interview - elevenlabs
+  
+- ### Assistent Avatar - beyondpresence
+
 
 ##
 
