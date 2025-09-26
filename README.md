@@ -18,11 +18,6 @@ By combining AI and semantic similarity search across the Max Planck research da
 
 
 
-## Demo
-
- video
-
-
 ## Assessment Criteria
 
 The final Breakthrough Potential Score is calculated by weighting the following criteria, each rated on a scale from 1 to 5 (1 = strongest, 5 = weakest)
@@ -39,11 +34,17 @@ The final Breakthrough Potential Score is calculated by weighting the following 
 10. Risk vs. Return
 
 
-Criteria 1, the novelty assessment is based on an empirical evauluation by accessing the Max Planck research database through the Logic Mill API. We measure the semantic similarity between a new idea and the global body of patents and research. A good score indicates few close matches (high novelty), while a low score reflects strong overlap with existing work.
+#### Max Planck Research Database - Logic Mill API
 
-The assessment of the criteria 2 - 10 is done by a claude agents.
+For the novelty assessment (criteria 1), Analysa accesses the Max Planck research database through the Logic Mill API to measure the semantic similarity between a submitted research abstract and the global body of patents and publications. Based on these similarity results, we count the number of documents—both patents and publications—that exceed a defined similarity threshold. To reflect real-world innovation dynamics, we weight patent counts more heavily than publication counts (4:1), since the existence of similar patents often indicates reduced economic potential for startups emerging from the research idea. A high score indicates few close matches (high novelty), while a low score reflects strong overlap with existing work.
+
+The evaluation of criteria 2–10 is performed by an advanced Claude-based AI agents, leveraging contextual reasoning and domain-specific knowledge to ensure accurate and consistent assessments.
 
 
+## Demo
+
+ video
+ 
 ## Tech Stack
 
 - ### Workflow Management - n8n
