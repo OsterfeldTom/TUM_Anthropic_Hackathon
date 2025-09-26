@@ -52,7 +52,7 @@ The assessment of the criteria 2 - 10 is done by a claude agents.
   short description
 - ### video avatar - beyondpresence
   short description
-![Workflow Architecture in n8n ](images/workflow_n8n.png)
+![Workflow Architecture in n8n ](images/n8n_workflow.png)
 
 ##
 
