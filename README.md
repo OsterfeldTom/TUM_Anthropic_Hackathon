@@ -66,7 +66,84 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
   
 
 
-##
+## Supplement - Assessment Criteria
+
+### Research Evaluation Criteria (1–5, strongest = 1, weakest = 5)
 
 
+1. **Novelty**
+   - 1 = This idea appears highly novel, with no or almost no closely related patents or publications found.
+   - 2 = This idea shows limited overlap with existing work, suggesting it introduces concepts not widely explored.” 
+   - 3 = This idea has some similarities to existing research or patents, but still shows a degree of originality.
+   - 4 = This idea overlaps strongly with established work, indicating it is less original and likely builds on existing concepts.  
+   - 5 = This idea is highly similar to many existing patents or publications, suggesting it is not novel.
 
+2. **Technical Feasibility**
+   - 1 = Strong experimental evidence, near prototype-ready.  
+   - 2 = Clear technical path, most hurdles addressed.  
+   - 3 = Feasible but key unknowns remain.  
+   - 4 = Mostly speculative.  
+   - 5 = Highly speculative, no path to feasibility.  
+
+3. **Scalability**
+   - 1 = Globally scalable across industries.  
+   - 2 = Large sector/region adoption possible.  
+   - 3 = Limited to a few industries.  
+   - 4 = Small/niche use.  
+   - 5 = Very narrow, not scalable.  
+
+4. **Market Attractiveness & Timing**
+   - 1 = Clear demand + strong timing.  
+   - 2 = Demand visible, timing good.  
+   - 3 = Potential demand but uncertain timing.  
+   - 4 = Weak/unclear demand.  
+   - 5 = No visible market.  
+
+5. **Competitive Advantage**
+   - 1 = Unique IP/know-how, hard to replicate.  
+   - 2 = Strong protection/barriers.  
+   - 3 = Some edge but replicable.  
+   - 4 = Weak differentiation.  
+   - 5 = No visible advantage.  
+
+6. **Economic & Societal Impact**
+   - 1 = Transformative global benefits.  
+   - 2 = Major benefits in big industries.  
+   - 3 = Moderate benefits.  
+   - 4 = Small/local impact.  
+   - 5 = Minimal impact.  
+
+7. **Application & Commercialization Pathway**
+   - 1 = Clear product/application + obvious payor/adopter.  
+   - 2 = Good application idea, likely payors identified.  
+   - 3 = Some potential applications, but value capture unclear.  
+   - 4 = Application highly speculative, no clear adopter.  
+   - 5 = No visible path to application or value creation.  
+
+8. **Time to Market**
+   - 1 = 3–5 years.  
+   - 2 = 5–7 years.  
+   - 3 = 7–10 years.  
+   - 4 = 10–15 years.  
+   - 5 = 15+ years.  
+
+9. **Team Strength**
+   - 1 = World-class, entrepreneurial, proven track record.  
+   - 2 = Strong, with translational experience.  
+   - 3 = Good but lacks commercial/venture experience.  
+   - 4 = Weak execution capacity.  
+   - 5 = No credible team evidence.  
+
+10. **Risk vs. Return**
+    - 1 = High risk, transformative upside.  
+    - 2 = Medium–high risk, strong upside.  
+    - 3 = Balanced but modest upside.  
+    - 4 = Low risk, low upside.  
+    - 5 = Poor balance.  
+
+11. **Strategic Fit (EU/Germany)**
+    - 1 = Critical for EU sovereignty/competitiveness.  
+    - 2 = Major relevance.  
+    - 3 = Some relevance.  
+    - 4 = Minor.  
+    - 5 = No relevance.  
