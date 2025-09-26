@@ -74,11 +74,11 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
 
 
 1. **Novelty**
-   - 1 = This idea appears highly novel, with no or almost no closely related patents or publications found.
-   - 2 = This idea shows limited overlap with existing work, suggesting it introduces concepts not widely explored.” 
-   - 3 = This idea has some similarities to existing research or patents, but still shows a degree of originality.
-   - 4 = This idea overlaps strongly with established work, indicating it is less original and likely builds on existing concepts.  
-   - 5 = This idea is highly similar to many existing patents or publications, suggesting it is not novel.
+   - 1 = Highly novel, with no or almost no closely related patents or publications found.
+   - 2 = Limited overlap with existing work, suggesting it introduces concepts not widely explored.” 
+   - 3 = Similarities to existing research or patents, but still shows a degree of originality.
+   - 4 = Overlaps strongly with established work, indicating it is less original and likely builds on existing concepts.  
+   - 5 = Highly similar to many existing patents or publications, suggesting it is not novel.
 
 2. **Technical Feasibility**
    - 1 = Strong experimental evidence, near prototype-ready.  
