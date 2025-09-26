@@ -10,6 +10,13 @@ Analysa is an AI-driven platform designed to evaluate the breakthrough potential
 Get Insights
 3. Receive a detailed report with scores, recommendations, and potential classification
 
+### Why Analysa?
+By combining AI and semantic similarity search across the Max Planck research database, Analysa helps:
+- Discover breakthrough research with startup potential
+- Support evidence-based funding decisions
+- Accelerate the journey from research to innovation
+
+
 
 ## Demo
 
