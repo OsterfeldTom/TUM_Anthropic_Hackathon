@@ -60,7 +60,6 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
     
 - ### Additional Logic - Claude API
   
-- ### Interview - elevenlabs
   
 - ### Assistant (Chat with Analysa) - beyondpresence
   <img src="resources/Chat_with_Analysa.jpeg" width="500" />
