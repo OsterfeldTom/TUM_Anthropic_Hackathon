@@ -1,0 +1,2547 @@
+{
+  "name": "TUM_Anthropic",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        384
+      ],
+      "id": "c86d57d0-a07e-4ffd-83f9-1b0dcad22413",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -3168,
+        304
+      ],
+      "id": "8a36782a-3071-49fd-b65d-702c30018685",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.query.pdf_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3360,
+        400
+      ],
+      "id": "af5e858b-55e1-4a59-9a64-842bc507d05d",
+      "name": "Receive PDF",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7Hn6T1b7xiRob1mP",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://nnvnymecgvnfhsujtzfy.supabase.co/storage/v1/object/sign/research-papers/public/870ffdc8-c316-461e-92a7-0cec77a9b348/bse0600381.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9iZDM1NTNmMC1jNzczLTRkNGUtYjhkNC03YmZjOTZiYjQzZjIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJyZXNlYXJjaC1wYXBlcnMvcHVibGljLzg3MGZmZGM4LWMzMTYtNDYxZS05MmE3LTBjZWM3N2E5YjM0OC9ic2UwNjAwMzgxLnBkZiIsImlhdCI6MTc1ODgxMTc4NCwiZXhwIjoxNzU4ODE1Mzg0fQ.vwNgOLwkEd7vpYFcL_VinhQDAdxsxz4qGvEt_L0uP9g",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3360,
+        256
+      ],
+      "id": "528105c6-ecbf-43b1-a501-9306ee73f79d",
+      "name": "Receive fixed PDF",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "7Hn6T1b7xiRob1mP",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3536,
+        256
+      ],
+      "id": "d7a38478-96c6-4d65-b561-2ed1769c87de",
+      "name": "Start fixed workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "applications",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.query.application_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3184,
+        720
+      ],
+      "id": "8cf81881-278b-4e86-b855-265b700f3305",
+      "name": "Get application_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "DrwIj6j57cZRH44s",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.logic-mill.net/api/v1/graphql/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJBUEkiLCJleHAiOjI2Mjk2NDA3MDQsImlhdCI6MTc1ODcyODcwNCwiaXNzIjoiTE9HSUMtTUlMTCIsImp0aSI6IjAxZjNkZmMzLTRkMzgtNDg4ZS04MGRmLTZiMTdhYjE3NjEzZSIsIm5iZiI6MTc1ODcyODcwNCwicGF5bG9hZCI6eyJ0b2tlbk5hbWUiOiJEZWZhdWx0IEFQSSBUb2tlbiJ9LCJzdWIiOiJhNjAxMDk4Mi00ZDJjLTRlOWMtYjlkMi0yMmRiOTQ1YTZmNDUifQ.tT5RvHuLuxs-EB5s93W-6ZScIzRFUbYD0izKQqHSlus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query embedDocumentAndSimilaritySearch($data: [EncodeDocumentPart], $indices: [String], $amount: Int, $model: String!) { encodeDocumentAndSimilaritySearch(data: $data, indices: $indices, amount: $amount, model: $model) { id score index document { title url publicationDate isParatext isRetracted} } }\",\n  \"variables\": {\n    \"model\": \"patspecter\",\n    \"data\": [\n      { \"key\": \"title\", \"value\": \"{{ $json.research_title }}\" },\n      { \"key\": \"abstract\", \"value\": \"{{ $json.abstract }}\" }\n    ],\n    \"amount\": 500,\n    \"indices\": [\"publications\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3264,
+        928
+      ],
+      "id": "1e6f0b3e-32c6-4f7c-ac07-825e5c9bf100",
+      "name": "Logic-Mill Api Publications Call"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.logic-mill.net/api/v1/graphql/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJBUEkiLCJleHAiOjI2Mjk2NDA3MDQsImlhdCI6MTc1ODcyODcwNCwiaXNzIjoiTE9HSUMtTUlMTCIsImp0aSI6IjAxZjNkZmMzLTRkMzgtNDg4ZS04MGRmLTZiMTdhYjE3NjEzZSIsIm5iZiI6MTc1ODcyODcwNCwicGF5bG9hZCI6eyJ0b2tlbk5hbWUiOiJEZWZhdWx0IEFQSSBUb2tlbiJ9LCJzdWIiOiJhNjAxMDk4Mi00ZDJjLTRlOWMtYjlkMi0yMmRiOTQ1YTZmNDUifQ.tT5RvHuLuxs-EB5s93W-6ZScIzRFUbYD0izKQqHSlus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query embedDocumentAndSimilaritySearch($data: [EncodeDocumentPart], $indices: [String], $amount: Int, $model: String!) { encodeDocumentAndSimilaritySearch(data: $data, indices: $indices, amount: $amount, model: $model) { id score index document { title url publicationDate isParatext isRetracted} } }\",\n  \"variables\": {\n    \"model\": \"patspecter\",\n    \"data\": [\n      { \"key\": \"title\", \"value\": \"{{ $json.research_title }}\" },\n      { \"key\": \"abstract\", \"value\": \"{{ $json.abstract }}\" }\n    ],\n    \"amount\": 500,\n    \"indices\": [\"patents\"]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3056,
+        944
+      ],
+      "id": "d28ce9b6-7ec7-47bf-b045-138a4146f9d8",
+      "name": "Logic-Mill Api Similarity Call"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23ec9f31-ee9e-4198-b947-e963deea8c60",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isParatext }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "94c31ed8-1f99-4df2-aca4-edf835c44b2f",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isRetracted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "08deac26-b701-47cc-b5ac-066d3aeca2c0",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].score }}",
+              "rightValue": 0.98,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3056,
+        1088
+      ],
+      "id": "c9fe676a-4efc-4aad-9b05-2d3f5595949c",
+      "name": "Similarity Filter",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23ec9f31-ee9e-4198-b947-e963deea8c60",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isParatext }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "94c31ed8-1f99-4df2-aca4-edf835c44b2f",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].document.isRetracted }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "08deac26-b701-47cc-b5ac-066d3aeca2c0",
+              "leftValue": "={{ $json.data.encodeDocumentAndSimilaritySearch[0].score }}",
+              "rightValue": 0.98,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -3264,
+        1088
+      ],
+      "id": "cb7c98ab-81ec-4563-ac27-a7dcf2411379",
+      "name": "Publication Filter",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Grab the first item\nitem = _input.all()[0]\n\nitem = _input.all()[0]\nif not items or not item[\"json\"] or not item[\"json\"].get(\"data\"):  # nothing came in at all, or no 'data' key\n    return [{\"json\": {\"score\": 5, \"count\": 0}}]\n\n\n# Navigate into the nested structure\ncount = len(item[\"json\"][\"data\"][\"encodeDocumentAndSimilaritySearch\"])\n\n# Discrete, explainable mapping from hit count -> score 1..5 (5 = most novel).\nbins = (1, 5, 15, 35)\nb1, b2, b3, b4 = bins\nif count <= b1:\n    score = 5\nelif count <= b2:\n    score = 4\nelif count <= b3:\n    score = 3\nelif count <= b4:\n    score = 2\nelse:\n    score = 1\n\n# Return array of dictionaries, as expected by n8n\nreturn [{\"json\": {\"score\": score, \"count\": count}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3264,
+        1248
+      ],
+      "id": "4e9efb5a-4a1e-45ee-9c7c-c3d129cac500",
+      "name": "Publication Scoring Algorithm"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Grab the first item\nitem = _input.all()[0]\nif not items or not item[\"json\"] or not item[\"json\"].get(\"data\"):  # nothing came in at all, or no 'data' key\n    return [{\"json\": {\"score\": 5, \"count\": 0}}]\n\n# Navigate into the nested structure\ncount = len(item[\"json\"][\"data\"][\"encodeDocumentAndSimilaritySearch\"])\n# Discrete, explainable mapping from hit count -> score 1..5 (5 = most novel).\nprint(count)\nbins = (1, 15, 50, 100)\nb1, b2, b3, b4 = bins\nif count <= b1:\n    score = 1\nelif count <= b2:\n    score = 2\nelif count <= b3:\n    score = 3\nelif count <= b4:\n    score = 4\nelse:\n    score = 5\n\n# Return array of dictionaries, as expected by n8n\nreturn [{\"json\": {\"score\": score, \"count\": count}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3056,
+        1248
+      ],
+      "id": "bb23d335-a099-4cf9-83e9-189c28f0b7d0",
+      "name": "Similarity Scoring Algorithm",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3056,
+        1424
+      ],
+      "id": "1a09eb95-bb84-4e1c-a114-278b3232b790",
+      "name": "Merge Scores"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n# Loop over input items and add a new field called 'myNewField' to the JSON of each one\ninput = _input.all()\n\npatents_score = items[0][\"json\"][\"score\"]\npublications_score = items[1][\"json\"][\"score\"]\nfinal_score = int(((patents_score * 4) + publications_score) /5)\nif final_score == 1:\n  rational = \"This idea appears highly novel, with no or almost no closely related patents or publications found.\"\nelif final_score == 2:\n  rational = \"This idea shows limited overlap with existing work, suggesting it introduces concepts not widely explored.\"\nelif final_score == 3:\n  rational = \"This idea has some similarities to existing research or patents, but still shows a degree of originality.\"\nelif final_score == 4:\n  rational = \"This idea overlaps strongly with established work, indicating it is less original and likely builds on existing concepts.\"\nelse:\n  rational = \"This idea is highly similar to many existing patents or publications, suggesting it is not novel.\"\n\nreturn [{\"json\": {\"output\" : json.dumps({\"score\": final_score, \"confidence\": 0.64, \"rationale\": rational, \"evidence\": \"Max Planck Similarity Search (Logic Mill Database)\", \"missing_data\":\"no data is missing\"}, indent=2), \"criterion_id\":\"5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817\"}}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3056,
+        1600
+      ],
+      "id": "00a91e0d-2215-4524-8451-a92058f531f1",
+      "name": "Process and Enrich"
+    },
+    {
+      "parameters": {
+        "path": "8bced5cf-92b0-4e4e-9df6-bfe60e3e9bb2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3536,
+        400
+      ],
+      "id": "1f09f1b4-b415-4280-a688-3a603eb3574b",
+      "name": "Webhook",
+      "webhookId": "5d58a52b-04f7-47c9-adc8-f79b0b8ae614"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2976,
+        304
+      ],
+      "id": "e8e277a3-5a7f-430b-9083-8c8fc753fa87",
+      "name": "Split"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "format_instructs",
+              "value": "EXTREMELY IMPORTANT, FOR YOUR FINAL ANSWER ONLY USE THIS FORMAT. DO NOT PROVIDE EXTRA INFORMATION, ONLY GIVE THE JSON AS OUTPUT! Do not invent facts. Base evaluation only on deck content.  Important, return your evaluation using the following format: {\"score\": integer, \"confidence\": float, \"rationale\": string, \"evidence\": string, \"missing_data\": string} (do not start with ````json) confidence is a score between 0 and 1. Here is an example output: \n\"{\\n    \\\"score\\\": 3,\\n    \\\"confidence\\\": 0.7,\\n    \\\"rationale\\\": \\\"Academic researchers with multi-institutional expertise, but unclear commercial/startup experience\\\", \\n    \\\"evidence\\\": \\\"Authors from UCL, University of Aberdeen, and Lobachevsky State University with diverse backgrounds in biochemical engineering, mathematics, physics, and control systems\\\",\\n    \\\"missing_data\\\": \\\"No evidence of startup founding, commercial venture experience, or technology transfer credentials\\\"\\n}\"\nIt is super important that you only return the json construct and not any additional text. For example, do NOT start with something like: \"Based on the research paper, here's the team strength evaluation\". READ THROUGH THE TEXT AGAIN AND REMEMBER THE OUTPUT FORMAT INSTRUCTIONS",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2928,
+        608
+      ],
+      "id": "389e462b-7b30-4942-840d-b42df3f9500a",
+      "name": "General Instructions / Format Instructions"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert technical due-diligence analyst specializing in evaluating technology readiness and feasibility in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Technical Feasibility of the proposed solution.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Strong experimental evidence; reproducible results and working prototype/implementation described.\n2 = Clear technical path; most hurdles addressed with credible methods or prior validation.\n3 = Feasible but key unknowns remain (e.g., scalability, edge cases, resource needs).\n4 = Mostly speculative; limited validation or unclear path to implementation.\n5 = Highly speculative; no credible path to feasibility presented.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Technical Feasibility.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s technical content (not just the authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 4, p. 12”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., implementation details, scalability tests, ablations, safety/reliability analysis)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tDevelopment stage: concept vs. implemented method, prototype, open-source code, hardware build, or real-world deployment details\n\t•\tTechnical milestones achieved: benchmarks met, performance vs. baselines, system integrations\n\t•\tScientific validation or pilot results: experimental setup, datasets, metrics, statistical rigor, ablations\n\t•\tTechnical team expertise: author affiliations, prior related work cited as capability signals\n\t•\tR&D roadmap clarity: future work/path to deployment, dependency on external advances (data, compute, materials)\n\t•\tKey technical risks addressed: safety, reliability, scalability, cost/energy constraints, compliance\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tDo not rely on assertions alone—justify feasibility using concrete methods, results, and implementation details.\n\t•\tIf the paper lacks information needed to judge feasibility, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        352
+      ],
+      "id": "5ab10b91-e848-4c8f-8d4e-3f594afe21c6",
+      "name": "Feasibility Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version of your prompt:\n\n⸻\n\nYou are an expert research evaluator specializing in assessing originality and differentiation in academic papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Originality & Differentiation of the work.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Radically new idea, no close alternatives.\n2 = Strong novelty, few similar works.\n3 = Builds on existing work but moderately new.\n4 = Incremental improvement, overlaps heavily.\n5 = Minimal originality, no clear differentiation.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Originality & Differentiation.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification that explains what is novel in content terms (do not merely repeat authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 7”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., clearer comparison to prior work, ablation showing uniqueness, formal proof of novelty)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tClaimed novel contributions vs. prior work (Related Work section, contribution bullets)\n\t•\tNew theory/algorithm/method, task, dataset, or benchmark\n\t•\tProprietary or IP claims (patents/disclosures) if present\n\t•\tMarket/knowledge gap or problem framing that is distinct from existing literature\n\t•\tComparisons to existing methods (qualitative and quantitative) that demonstrate differentiation\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tDo not rely on novelty claims alone; justify based on concrete methodological, theoretical, or empirical differences described in the text.\n\t•\tIf the paper lacks explicit comparisons or detail needed to judge novelty, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        160
+      ],
+      "id": "6e64472b-b4f6-4819-a32a-5574b4adab4e",
+      "name": "Originality Agent Prompt"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        144
+      ],
+      "id": "386e6ec2-2d45-4f32-a733-79220e58bde3",
+      "name": "Merge Prompts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        160
+      ],
+      "id": "a7c9a335-1d87-4e91-a5a4-238fc7bb1ab0",
+      "name": "Orignality Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'21b49bdc-fa17-412f-a87a-adc4f344ff54'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        160
+      ],
+      "id": "e617f19f-1063-40d9-a723-63afb458b8b3",
+      "name": "Enrich and Format Data"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        160
+      ],
+      "id": "b9aade00-c7f0-4228-afa9-5f65677e380c",
+      "name": "Preprocess Prompt"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        336
+      ],
+      "id": "c2acc92e-7673-41f2-a766-c7861d2d95dc",
+      "name": "Preprocess Prompt1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        512
+      ],
+      "id": "054f6348-6b10-4630-913c-44e4928e2961",
+      "name": "Preprocess Prompt2"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        688
+      ],
+      "id": "a032e02e-93ce-435b-a27e-c2cff502d6d4",
+      "name": "Preprocess Prompt3"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        880
+      ],
+      "id": "9d8ea6b5-0e14-4592-82b8-ed4b8168ea85",
+      "name": "Preprocess Prompt4"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        1072
+      ],
+      "id": "70224d09-fd38-48b6-bcde-c4f0e2e5403c",
+      "name": "Preprocess Prompt5"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        1280
+      ],
+      "id": "5b8d1756-7f94-4911-b94a-7647130f3fbe",
+      "name": "Preprocess Prompt6"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2176,
+        1472
+      ],
+      "id": "d31a522b-aa2a-41a1-8fcd-6f6560df327f",
+      "name": "Preprocess Prompt7"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2176,
+        1648
+      ],
+      "id": "91061e58-6753-48f1-bae7-cb3dfa8ba5a3",
+      "name": "Preprocess Prompt8"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = \"\"\noutput = f\"-- Here are the output format instructions {_input.all()[1].json.format_instructs} -- here are the general instructions -- {_input.all()[0].json.prompt} -- here is the pdf extracted to text -- {_input.all()[2].json.text}\"\n\nreturn [{\"output\":output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2176,
+        1840
+      ],
+      "id": "0d6aa51a-8834-4410-8bdc-a4d177900d29",
+      "name": "Preprocess Prompt9"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        320
+      ],
+      "id": "397fa7c1-7086-4ab0-a8d3-2336582f88b0",
+      "name": "Merge Prompts1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        496
+      ],
+      "id": "04c6c5ba-6be4-4d3f-b513-69a9023e591f",
+      "name": "Merge Prompts2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        672
+      ],
+      "id": "69542bcb-32bf-4ae9-af15-235e01765953",
+      "name": "Merge Prompts3"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        864
+      ],
+      "id": "84d7a624-6e78-4b66-9c87-681f4accb59e",
+      "name": "Merge Prompts4"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        1056
+      ],
+      "id": "0a68fa0a-5dc1-43d9-9ab3-0548334add56",
+      "name": "Merge Prompts5"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        1264
+      ],
+      "id": "3cc7290a-44aa-4fd5-944f-44f4a802a80c",
+      "name": "Merge Prompts6"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        1456
+      ],
+      "id": "636567f7-f064-4a9d-b96c-20e3d70f49a7",
+      "name": "Merge Prompts7"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        1632
+      ],
+      "id": "b9e92078-3bcb-41c5-ab13-9786a578c8b6",
+      "name": "Merge Prompts8"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -2400,
+        1824
+      ],
+      "id": "7728d291-d658-46cf-b77e-40edddf215af",
+      "name": "Merge Prompts9"
+    },
+    {
+      "parameters": {
+        "numberInputs": 10
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1440,
+        544
+      ],
+      "id": "8c8871d3-8427-4514-9510-3c99ae29ce93",
+      "name": "Merge Agent Outputs"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        336
+      ],
+      "id": "8ba5c842-3cf6-4665-9619-3f467b6a97de",
+      "name": "Feasibility Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        512
+      ],
+      "id": "0ee619b2-fd3f-471c-baf8-14c657b2cb92",
+      "name": "Scalability Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        688
+      ],
+      "id": "2f3d0808-0d2a-44d8-b4a5-5cd23bd66fee",
+      "name": "Market Attractiveness Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        880
+      ],
+      "id": "d4376086-8af7-4bcf-a38b-8aac9b02340a",
+      "name": "Competetive Advantage Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        1072
+      ],
+      "id": "30ea6fb9-523d-4b5f-ad67-7852b9fcbd1d",
+      "name": "Economic and Societal Impact Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        1472
+      ],
+      "id": "1c8e612c-0505-4c80-823c-f246ea6de7e5",
+      "name": "Time To Market Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        1648
+      ],
+      "id": "a8aadf04-3205-4b4a-bde1-564f83afb764",
+      "name": "Team Strength Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        1840
+      ],
+      "id": "44610830-81f9-45e5-9423-dc16fa0b490a",
+      "name": "Risk vs. Return Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'5ca0e3ee-2ce2-41ed-b47d-fddc6ca6f817'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        336
+      ],
+      "id": "7289663a-9ab2-4983-a654-2c31e0929951",
+      "name": "Enrich and Format Data1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'8e2e9281-7782-4b38-ac5e-f790df541c5a'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        512
+      ],
+      "id": "826735c1-ba29-46cc-802d-bf4bacaafc90",
+      "name": "Enrich and Format Data2"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'9de42bcb-2d8a-45e6-bcaa-1cf126443ec5'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        688
+      ],
+      "id": "df8c163b-6c8e-4b97-b91a-4dc2905648aa",
+      "name": "Enrich and Format Data3"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'9f50e7a8-25d9-44e1-b773-f1596a165bdc'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        880
+      ],
+      "id": "7a9d498a-abb9-4bd4-ade0-3bf0a09419de",
+      "name": "Enrich and Format Data4"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'a93196c7-0708-41dc-ada3-061fe628e5c6'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        1072
+      ],
+      "id": "ec8626dc-6754-4918-ae81-aa600eb9d800",
+      "name": "Enrich and Format Data5"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'b351c8fd-38e6-4085-84eb-7ff6c7ff898f'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        1280
+      ],
+      "id": "84364a56-6193-4e2e-b6d0-31f39da3dbba",
+      "name": "Enrich and Format Data6"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'bffee53c-dc9e-4834-9873-6d3ca0df988d'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        1472
+      ],
+      "id": "fad23a79-0f6a-47c6-a0ed-5a4ca7ab17c2",
+      "name": "Enrich and Format Data7"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'c195111d-8791-4980-b56f-c9a56f89f66f'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        1648
+      ],
+      "id": "de53fe73-a826-4a02-8787-13b0064d7350",
+      "name": "Enrich and Format Data8"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return [{\"output\": _input.all()[0].json.output, \"criterion_id\":'f9c224ea-e562-49a1-992a-c3d2113d5c2b'}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        1840
+      ],
+      "id": "c4ea7b9f-22b1-4577-95bc-e188446b767e",
+      "name": "Enrich and Format Data9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert growth strategist specializing in evaluating scalability potential in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Scalability of the proposed approach/system.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Globally scalable across domains and settings with minimal adaptation.\n2 = Broad adoption possible within large sectors/regions; moderate adaptation needed.\n3 = Applicable to a few domains/tasks; notable constraints limit wider use.\n4 = Suited mainly to small or niche contexts; significant barriers to scale.\n5 = Very narrow applicability; no credible path to scale.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Scalability.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not author hype)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 5, p. 14”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., cross-domain evals, cost/latency benchmarks, deployment case studies)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tAddressable scope: tasks/domains where the method is applicable; evidence of cross-domain generalization\n\t•\tGeographic/deployment breadth: feasibility across regions/infrastructures (cloud/on-prem/edge)\n\t•\tVertical applicability: adaptability to multiple industries or datasets/benchmarks\n\t•\tGrowth mechanics: network effects, data network effects, platform extensibility, ecosystem readiness\n\t•\tUnit economics at scale: compute/storage/latency/energy needs; throughput; OPEX/CAPEX implications\n\t•\tPlatform vs. point solution: modularity, APIs, standard compliance, interoperability\n\t•\tBarriers to scale: specialized hardware, scarce data, regulatory/safety constraints, operational complexity\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tFavor concrete scalability evidence (e.g., large-scale experiments, ablations on resource use, cross-dataset results) over claims.\n\t•\tIf key details for judging scalability are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        528
+      ],
+      "id": "3d441c78-3066-44e3-8d90-dcd983d56523",
+      "name": "Scalability Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert market analyst specializing in evaluating market opportunity and timing in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate Market Attractiveness & Timing for the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Clear demand and strong timing evidenced in the paper (e.g., pilots/user studies, partner interest, compelling tailwinds).\n2 = Demand visible; timing good with credible enablers or early validation.\n3 = Potential demand but timing uncertain; limited or indirect validation.\n4 = Weak/unclear demand; mostly theoretical interest with scant application evidence.\n5 = No visible market or application context presented.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Market Attractiveness & Timing.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not just author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 2, p. 5”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., TAM/CAGR estimates, user willingness-to-pay, regulatory status, deployment cost curves)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tMarket size & growth cited in the paper (TAM/SAM/SOM, CAGR)\n\t•\tPain-point urgency and problem criticality for intended users/sectors\n\t•\tTrends & tailwinds (technological, regulatory, or infrastructure enablers)\n\t•\tCustomer/partner validation (LOIs, pilots, field trials, revenue/usage signals)\n\t•\tCompetitive landscape maturity and differentiation relevance to buyers\n\t•\tWhy now vs. why not before (new capabilities, costs, regulation)\n\t•\tBarriers that could delay timing (regulatory hurdles, data access, deployment constraints)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete in-paper evidence (empirical results, case studies, stated partners) over speculative language.\n\t•\tIf crucial market/timing details are missing, lower confidence and fill enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        704
+      ],
+      "id": "df853cfa-2941-4ee4-888b-dd82af358a40",
+      "name": "Market Attractiveness Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert competitive strategy analyst specializing in evaluating sustainable competitive advantages in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Competitive Advantage of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Unique IP/know-how or defensible assets; hard to replicate.\n2 = Strong protection/barriers (credible moat, partial replication possible).\n3 = Some edge but reasonably replicable with effort.\n4 = Weak differentiation; easy to copy.\n5 = No visible advantage.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Competitive Advantage.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification grounded in the paper’s content (what makes it defensible, not just authors’ claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 8”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., IP status, dataset licensing, reproducibility limits, exclusive access)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tPatents, disclosures, trade secrets, or proprietary methods/code/datasets\n\t•\tData moats (exclusive data access, long-tail annotations, unique pipelines) and network effects\n\t•\tSwitching costs / lock-in (standards integration, ecosystem dependencies, proprietary formats/APIs)\n\t•\tFirst-mover or standard-setting advantages (benchmarks, community adoption, citations)\n\t•\tExclusive partnerships or restricted resources (hardware, compute credits, consortia, field sites)\n\t•\tTeam’s distinctive expertise or prior art indicating execution advantage\n\t•\tRegulatory barriers/certifications or compliance capabilities that are hard to match\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete, verifiable defenses (IP filings, non-public data, reproducibility limits, ablations showing sensitivity to secret components) over generic claims.\n\t•\tIf crucial details are missing to judge defensibility, lower confidence and fill enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        880
+      ],
+      "id": "580118b2-5954-465b-bd3e-2f0d8adf1e04",
+      "name": "Competitive Advantage Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert impact assessment analyst specializing in evaluating economic and societal benefits in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Economic & Societal Impact of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Transformative global benefits with credible evidence or pathway.\n2 = Major benefits in large sectors/regions with supportive evidence.\n3 = Moderate benefits; promising signals but limited scope or validation.\n4 = Small/local impact; weak or anecdotal evidence.\n5 = Minimal impact; no compelling benefits described.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Economic & Societal Impact.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (explain why the impact is at this level, not just the authors’ claim)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 6, p. 18”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., LCA results, cost–benefit/TCO analysis, RCT or field trial outcomes, adoption studies)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tJob creation / productivity effects or projected employment impacts\n\t•\tEnvironmental benefits / sustainability (e.g., lifecycle assessment, emissions/energy/waste reductions)\n\t•\tHealthcare or quality-of-life improvements (clinical/field evidence, safety outcomes)\n\t•\tCost savings for industries, institutions, or consumers (CAPEX/OPEX, TCO)\n\t•\tAccessibility / democratization (low-cost design, low-resource deployment, open tools)\n\t•\tUN SDG alignment explicitly stated or inferable from objectives\n\t•\tEconomic value creation estimates (market efficiencies, GDP/sector gains, welfare impacts)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete, measurable impact evidence (studies, pilots, quantified deltas) over aspirational language.\n\t•\tIf impact/timing data are missing or speculative, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        1072
+      ],
+      "id": "c65f36f1-7081-4259-b632-3ea84d2be2c5",
+      "name": "Economic and Societal Impact Agent Prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2000,
+        1280
+      ],
+      "id": "4be68ba6-66ec-44e4-bee8-f0584af0b70e",
+      "name": "Strategic Fit for EU/Germany Agent",
+      "notesInFlow": true,
+      "notes": "Double-click to open"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert product development analyst specializing in evaluating time-to-deployment timelines in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Time to Market / Practical Deployment of the proposed technology.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = 3–5 years to deployment.\n2 = 5–7 years.\n3 = 7–10 years.\n4 = 10–15 years.\n5 = 15+ years.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Time to Market / Practical Deployment.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (not just author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 4, p. 12”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., regulatory pathway, pilot schedule, manufacturing scale-up plan)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tCurrent development stage / TRL: concept vs. prototype, implementation details, code/hardware availability\n\t•\tRoadmap & milestones stated in “Future Work” or deployment sections\n\t•\tRegulatory approvals / standards compliance relevant to the domain (e.g., medical, safety, data privacy)\n\t•\tManufacturing or scale-up timeline (supply chain, facilities, specialized materials)\n\t•\tBeta testing / pilot programs: scope, duration, and required resources\n\t•\tDeployment or commercialization timeline if discussed (e.g., planned trials, partner timelines)\n\t•\tIndustry-specific development cycles and dependencies (data, compute, certifications)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (working prototype, scheduled pilots, stated regulatory plan) over aspirational language.\n\t•\tIf key timeline details are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        1280
+      ],
+      "id": "f73ccb69-3f3d-45c0-8486-6ede6d82c82e",
+      "name": "Strategic Fit for EU/Germany Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert talent assessment specialist focusing on evaluating founding-team strength in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Team Strength behind the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = World-class, entrepreneurial, proven track record (spin-outs, deployments, notable awards).\n2 = Strong team with translational experience (industry collaborations, pilots, open-source adoption).\n3 = Good domain expertise but limited commercial/venture experience.\n4 = Weak execution capacity (narrow skills, unclear ownership, limited applied outcomes).\n5 = No credible team evidence.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Team Strength.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on concrete content (explain why the team merits this score; avoid parroting author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Author info, p. 2”; “Acknowledgments, Sec. 8, p. 17”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list missing data if confidence is 3–5 (e.g., author bios, prior startups, commercialization history, GitHub links)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tPrior startup/exit or spin-out experience mentioned in the paper (e.g., disclosures, conflicts of interest).\n\t•\tDomain expertise & years of experience (senior PI status, key prior publications, industrial lab affiliations).\n\t•\tBalance of skills relevant to translation (methods/engineering, product, regulatory/clinical/domain experts).\n\t•\tAdvisory board / collaborators (industry partners, hospitals, standards bodies, consortia).\n\t•\tTeam completeness vs. gaps (manufacturing, data, safety, compliance).\n\t•\tAcademic/industry credentials & achievements (best paper awards, benchmarks, deployments, grants).\n\t•\tPast performance signals (real-world pilots, open-source adoption, citation/benchmark leadership noted in paper).\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tFavor concrete signals (deployments, disclosed partnerships, maintained code/artifacts) over generic statements.\n\t•\tIf team details are sparse, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        1472
+      ],
+      "id": "18e648e6-3d1d-4cdd-a76d-86a05029c257",
+      "name": "Time To Market Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert risk assessment analyst specializing in evaluating risk–return profiles in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Risk vs. Return profile of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = High technical/translation risk with transformative upside if successful.\n2 = Medium–high risk with strong potential upside.\n3 = Balanced profile: moderate risks with modest upside.\n4 = Low risk but limited upside.\n5 = Poor balance (significant risks with little credible upside).\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Risk vs. Return.\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification grounded in the paper’s content (explain why this risk–return balance holds; avoid parroting claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 3, p. 8”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., cost model, risk register, sensitivity analysis, regulatory mapping)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tApplication breadth vs. execution complexity (deployment settings, dependencies, required breakthroughs)\n\t•\tResource/capital requirements vs. potential benefits (compute, data, lab equipment, manufacturing, OPEX/CAPEX)\n\t•\tTechnical risk vs. opportunity size (scalability limits, robustness, generalization vs. addressable problem impact)\n\t•\tAlternative methods/competition risk vs. differentiation (baselines, ablations, unique capabilities)\n\t•\tRegulatory/safety/privacy risks vs. market access or adoption pathways\n\t•\tTranslation/exit potential analogs (prior deployments, standardization prospects, ecosystem fit)\n\t•\tCapital efficiency metrics/proxies (cost per inference/experiment, training/runtime budgets, throughput/energy)\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (quantified results, cost/performance analyses, explicit risk discussions) over aspirational language.\n\t•\tIf critical inputs to judge risk or upside are missing, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        1648
+      ],
+      "id": "844aa706-a74c-4e11-8cab-b4f79332d6b4",
+      "name": "Team Strength Agent Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ae6777b-9080-4b87-8303-7503e51c92c3",
+              "name": "prompt",
+              "value": "Here’s a paper-focused version:\n\n⸻\n\nYou are an expert European venture strategist specializing in evaluating strategic importance for EU/German competitiveness and sovereignty in academic research papers.\n\nYour task is to analyze the provided research paper PDF and evaluate the Strategic Fit for EU/Germany of the proposed technology/approach.\n\nEvaluate the criterion from 1 to 5 (1 = strongest, 5 = weakest):\n1 = Critical for EU sovereignty/competitiveness.\n2 = Major relevance.\n3 = Some relevance.\n4 = Minor relevance.\n5 = No relevance.\n\nInstructions:\n\t•\tAssign an integer score (1–5) for Strategic Fit (EU/Germany).\n\t•\tReturn a JSON response with:\n\t•\tscore: integer (1–5)\n\t•\treason: concise 1–2 sentence justification based on the paper’s content (explain why it matters for EU/Germany; don’t just repeat author claims)\n\t•\tevidence: direct quotes from the paper with page and/or section numbers (e.g., “Sec. 2, p. 5”) or \"no evidence found\"\n\t•\tconfidence: 1–5 (1 = highest confidence, 5 = lowest)\n\t•\tenrichment_needed: list of missing data if confidence is 3–5 (e.g., EU location of labs, supply-chain reliance, regulatory alignment)\n\t•\tdecision: \"manual_review\" or \"sufficient_information\"\n\nFocus on:\n\t•\tAlignment with EU initiatives (e.g., Green Deal, Digital Strategy, Chips/AI/Net-Zero Acts) explicitly discussed in the paper\n\t•\tReduced dependency on non-EU suppliers (materials, data, compute, tooling)\n\t•\tStrengthening key European industries (automotive, health, energy, semiconductors, aerospace, manufacturing)\n\t•\tCreation of high-skilled EU jobs or capability building (labs, centers, training)\n\t•\tDeep-tech/frontier areas with strategic value (semis, AI, robotics, biotech, quantum, advanced materials)\n\t•\tDual-use/defense relevance or standards/critical infrastructure implications\n\t•\tEU/German presence: author affiliations, EU grants (e.g., Horizon Europe), EU-based datasets/testbeds, consortia participation\n\nRules:\n\t•\tDo not invent facts or use external sources; base your evaluation only on the paper’s content.\n\t•\tPrefer concrete signals (EU funding acknowledgments, EU partners, standards compliance, EU-specific use cases) over general statements.\n\t•\tIf the paper lacks EU/Germany context, lower confidence and populate enrichment_needed.\n\n⸻\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2592,
+        1840
+      ],
+      "id": "075c6e9e-66ff-4fb6-9d03-e7abb7d26849",
+      "name": "Risk vs. Return Agent Prompt"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "criteria_preferences"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        320
+      ],
+      "id": "f1e03e30-36fa-4977-bc58-4e72fb43946c",
+      "name": "Receive Weight Configs",
+      "credentials": {
+        "supabaseApi": {
+          "id": "My2lbCWSi820IHby",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "output = []\n\nfor item in _input.all():\n  output.append(item)\n\nreturn [{\"criteria_preferences\": output}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1344,
+        320
+      ],
+      "id": "92b0d7fb-8f0f-4ffa-a527-621419157611",
+      "name": "Enrich Weight Configs"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1232,
+        560
+      ],
+      "id": "e7dd7784-5c8d-499e-b289-e141eb267f0f",
+      "name": "Merge Configs, Logic-Mill- And Agent Output"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\nimport random\nimport uuid\n\nkey = str(uuid.uuid4())\n\nconfigs = _input.all()[0].json.criteria_preferences\nweights = {}\n\nfor criterion in configs:\n  criterion_id = criterion.json.id\n  weight = criterion.json.factor\n  weights[criterion_id] = weight\n\nagent_outputs = _input.all()[1:]#[5:6]\noutput = []\n\nconf_sum = 0\nsum = 0\ndivident = 0\n\nprint(agent_outputs)\n\nfor i, item in enumerate(agent_outputs): \n  json_obj = json.loads(item.json.output)\n  criterion_id = item.json.criterion_id\n  score = json_obj['score']\n  rationale = json_obj['rationale']\n  missing_data = json_obj['missing_data']\n  evidence = json_obj['evidence']\n  confidence = json_obj['confidence']\n\n  weight = weights[criterion_id]\n  sum += score * weight\n  conf_sum += confidence * weight\n  divident += weight\n\n  item.json.score = score\n  item.json.confidence = confidence\n  item.json.rationale = rationale\n  item.json.missing_data = missing_data\n  item.json.evidence = evidence\n  item.json.key = key\n  output.append(item)\n\navg = sum / divident\navg_conf = conf_sum / divident\n  \noutput.append({'total_score':sum, 'avg' : avg, 'avg_conf' : avg_conf, 'key' : key})\n\nreturn {\"output\":output}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        576
+      ],
+      "id": "5a5a38f5-d012-4ec1-837c-3a45cc261896",
+      "name": "Calculate Weighted Average and Confidence Scores"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://nnvnymecgvnfhsujtzfy.supabase.co/functions/v1/insert-criteria-score",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "missing_data",
+              "value": "={{ $json.json.missing_data }}"
+            },
+            {
+              "name": "confidence",
+              "value": "={{ $json.json.confidence }}"
+            },
+            {
+              "name": "evidence",
+              "value": "={{ $json.json.evidence }}"
+            },
+            {
+              "name": "rationale",
+              "value": "={{ $json.json.rationale }}"
+            },
+            {
+              "name": "confidence",
+              "value": "={{ $json.json.confidence }}"
+            },
+            {
+              "name": "score",
+              "value": "={{ $json.json.score }}"
+            },
+            {
+              "name": "criterion_id",
+              "value": "={{ $json.json.criterion_id }}"
+            },
+            {
+              "name": "raw",
+              "value": "={{ $json.json.output }}"
+            },
+            {
+              "name": "potential_id",
+              "value": "={{ $json.json.key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        384
+      ],
+      "id": "6696f942-52c3-4c31-b80e-b56ef91135a9",
+      "name": "Store Criteria Evaluations"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return _input.all()[0]['json']['output'][:-1]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        384
+      ],
+      "id": "db62f1a8-d9f1-4a53-abeb-79132089fd95",
+      "name": "Calculate Criteria Evaluation"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "return {\"output\":_input.all()}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        384
+      ],
+      "id": "0b285cd9-53be-4cec-aa17-95fbd1a81a83",
+      "name": "Enrich Data"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-3-5-haiku-20241022",
+          "mode": "list",
+          "cachedResultName": "Claude Haiku 3.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -2752,
+        1840
+      ],
+      "id": "2a1d0a04-efa4-44aa-a8a4-9c4041721c3a",
+      "name": "Claude 4.1 Sonnet",
+      "credentials": {
+        "anthropicApi": {
+          "id": "TQ1OPIyzMmbUTaks",
+          "name": "Anthropic account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "potentials",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "application_id",
+              "fieldValue": "={{ $('Webhook').first().json.query.application_id }}"
+            },
+            {
+              "fieldId": "avg_score",
+              "fieldValue": "={{ $json.output[10].avg }}"
+            },
+            {
+              "fieldId": "overall_confindence",
+              "fieldValue": "={{ $json.output[10].avg_conf }}"
+            },
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json.output[10].key }}"
+            },
+            {
+              "fieldId": "progress_stage",
+              "fieldValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        768
+      ],
+      "id": "4ada978f-bddf-4a52-973c-50d4fe0dde3a",
+      "name": "Store Toltal Score and Overall Confidence",
+      "credentials": {
+        "supabaseApi": {
+          "id": "My2lbCWSi820IHby",
+          "name": "Supabase account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Risk vs. Return Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 3,\n    \"confidence\": 0.6,\n    \"rationale\": \"Research on synthetic gene networks for bio-artificial intelligence has potential interdisciplinary relevance for EU biotech and computational innovation, though lacks explicit EU strategic focus\",\n    \"evidence\": \"Multi-institutional authors from UCL, University of Aberdeen, and Lobachevsky State University across biochemical engineering, mathematics, and physics disciplines (p. 381)\",\n    \"missing_data\": \"No direct mentions of EU funding sources, Horizon Europe grants, EU research consortia, or specific alignment with EU digital/biotech strategy initiatives\"\n}"
+        }
+      }
+    ],
+    "Team Strength Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 2,\n    \"confidence\": 0.8,\n    \"rationale\": \"The paper proposes highly innovative synthetic gene networks (SGNs) with medium-high technical risk but transformative potential in bio-artificial intelligence by enabling cellular learning and classification capabilities\", \n    \"evidence\": \"SGNs have been designed to perform Pavlovian associative learning and Perceptron-based linear classification, with in silico simulations providing preliminary confirmation of learning algorithms encoded in gene networks (Summary section)\",\n    \"missing_data\": \"Lack of experimental validation, unclear scalability of proposed SGN architectures beyond proof-of-concept simulations\"\n}"
+        }
+      }
+    ],
+    "Time To Market Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 2,\n    \"confidence\": 0.8,\n    \"rationale\": \"Multi-institutional team of academic researchers with strong interdisciplinary expertise in biochemical engineering, mathematics, physics, and control systems, demonstrating potential for translational research in synthetic biology\",\n    \"evidence\": \"Authors from UCL, University of Aberdeen, and Lobachevsky State University with diverse backgrounds in biochemical engineering, mathematics, physics, and control systems engineering (affiliations listed on first page)\",\n    \"missing_data\": \"Limited evidence of commercial startup experience or technology transfer; no disclosed industry partnerships or spin-out history\"\n}"
+        }
+      }
+    ],
+    "Strategic Fit for EU/Germany Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 4,\n    \"confidence\": 0.6,\n    \"rationale\": \"Early-stage theoretical research exploring synthetic gene networks for bio-artificial intelligence, with complex design challenges and no clear near-term commercial deployment roadmap\", \n    \"evidence\": \"No reports exist of application of synthetic gene networks in commercial biomanufacturing process (p. 389). Current work remains at theoretical/experimental simulation stage\",\n    \"missing_data\": \"Experimental validation, scaling strategies, manufacturing feasibility, regulatory pathway for bio-AI systems, precise time-to-market milestones\"\n}"
+        }
+      }
+    ],
+    "Economic and Societal Impact Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 3,\n    \"confidence\": 0.6,\n    \"rationale\": \"The paper proposes theoretical synthetic biology approaches to bio-artificial intelligence with moderate potential societal and economic impact, demonstrating promising early-stage research into adaptive cellular computing systems\", \n    \"evidence\": \"Possible industrial applications of SGNs that can learn include designing cells that can respond to large, small, intended and unintended perturbations in bioprocess environments while maintaining optimal productivity, such as biotherapeutic production, resource utilisation or biosynthesis of high value chemicals (p. 388)\",\n    \"missing_data\": \"No experimental validation, no quantitative economic impact assessment, no demonstration of actual implementation in industrial processes\"\n}"
+        }
+      }
+    ],
+    "Competetive Advantage Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 3,\n    \"confidence\": 0.6,\n    \"rationale\": \"The paper proposes novel synthetic gene network (SGN) architectures for implementing learning algorithms, but lacks concrete evidence of unique, defensible intellectual property\",\n    \"evidence\": \"Multiple proposed SGN designs for classification and associative learning, including 'biological student-teacher network', 'positive feedback/negative modified network', and 'ensemble classifiers'\",\n    \"missing_data\": \"No patent disclosures, no specific IP filings mentioned, lack of detailed implementation protocols, no exclusive rights to proposed network architectures\"\n}"
+        }
+      }
+    ],
+    "Orignality Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 2,\n    \"confidence\": 0.9,\n    \"rationale\": \"The paper proposes novel approaches to implementing learning algorithms and artificial intelligence using synthetic gene networks, presenting several innovative computational approaches using biological circuits\",\n    \"evidence\": \"Design of synthetic gene networks that can perform perceptron-based linear classification, Pavlovian associative learning, and complex input classification through ensemble approaches\",\n    \"missing_data\": \"Limited experimental validation of proposed synthetic gene network designs, mostly relies on mathematical simulations\"\n}"
+        }
+      }
+    ],
+    "Market Attractiveness Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 3,\n    \"confidence\": 0.6,\n    \"rationale\": \"The paper presents theoretical and computational approaches for synthetic gene networks capable of learning, but lacks concrete commercial or industrial validation evidence\",\n    \"evidence\": \"Possible industrial applications mentioned in section 'Applications and implications of bio-artificial intelligence', such as 'designing cells that can respond to large, small, intended and unintended perturbations in bioprocess environments' (p. 388), but no actual implementation demonstrated\",\n    \"missing_data\": \"Commercial pilot studies, technology readiness level (TRL), specific industrial partners, cost-benefit analysis, scalability assessment, performance metrics for proposed synthetic gene network learning approaches\"\n}"
+        }
+      }
+    ],
+    "Feasibility Agent": [
+      {
+        "json": {
+          "output": "{\"score\": 2, \"confidence\": 0.8, \"rationale\": \"The paper presents multiple theoretical and computational approaches to implementing learning algorithms using synthetic gene networks (SGNs), with detailed computational models and conceptual designs demonstrating technical feasibility.\", \"evidence\": \"Provided computational simulations for perceptron-like linear classification (Fig. 1-2), associative learning networks (Fig. 4), and ensemble classification strategies (Fig. 5-6)\", \"missing_data\": \"No experimental validation of proposed synthetic gene network designs; only in silico simulations and theoretical proposals\"}"
+        }
+      }
+    ],
+    "Scalability Agent": [
+      {
+        "json": {
+          "output": "{\n    \"score\": 3,\n    \"confidence\": 0.6,\n    \"rationale\": \"Synthetic gene networks show potential for limited scalability within biological systems, with promising early-stage capabilities for classification and learning, but significant challenges remain for broad practical deployment\",\n    \"evidence\": \"Proposed synthetic gene networks can perform basic perceptron-like classification and associative learning, with ensemble approaches enabling classification of complex input signals (Sec. 'Ensembles of SGNs for classification of complex inputs', p. 387)\",\n    \"missing_data\": \"Lack of experimental validation, no large-scale implementation demonstrations, unclear performance under real-world variability, no comprehensive benchmarking across different biological contexts\"\n}"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Store Criteria Evaluations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive fixed PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start fixed workflow": {
+      "main": [
+        [
+          {
+            "node": "Receive fixed PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get application_id": {
+      "main": [
+        [
+          {
+            "node": "Logic-Mill Api Similarity Call",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Logic-Mill Api Publications Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logic-Mill Api Publications Call": {
+      "main": [
+        [
+          {
+            "node": "Publication Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logic-Mill Api Similarity Call": {
+      "main": [
+        [
+          {
+            "node": "Similarity Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Similarity Filter": {
+      "main": [
+        [
+          {
+            "node": "Similarity Scoring Algorithm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publication Filter": {
+      "main": [
+        [
+          {
+            "node": "Publication Scoring Algorithm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publication Scoring Algorithm": {
+      "main": [
+        [
+          {
+            "node": "Merge Scores",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Similarity Scoring Algorithm": {
+      "main": [
+        [
+          {
+            "node": "Merge Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Scores": {
+      "main": [
+        [
+          {
+            "node": "Process and Enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process and Enrich": {
+      "main": [
+        [
+          {
+            "node": "Merge Configs, Logic-Mill- And Agent Output",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Receive PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Receive Weight Configs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Originality Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "General Instructions / Format Instructions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Prompts1",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts2",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts3",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts4",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts5",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts6",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts7",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts8",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Merge Prompts9",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Feasibility Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Market Attractiveness Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Competitive Advantage Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Economic and Societal Impact Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Strategic Fit for EU/Germany Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Time To Market Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Team Strength Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Risk vs. Return Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Prompts",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "Scalability Agent Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get application_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Instructions / Format Instructions": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts2",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts3",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts4",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts5",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts6",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts7",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts8",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts9",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge Prompts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Feasibility Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Originality Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orignality Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt": {
+      "main": [
+        [
+          {
+            "node": "Orignality Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt1": {
+      "main": [
+        [
+          {
+            "node": "Feasibility Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt2": {
+      "main": [
+        [
+          {
+            "node": "Scalability Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt3": {
+      "main": [
+        [
+          {
+            "node": "Market Attractiveness Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt4": {
+      "main": [
+        [
+          {
+            "node": "Competetive Advantage Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt5": {
+      "main": [
+        [
+          {
+            "node": "Economic and Societal Impact Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt6": {
+      "main": [
+        [
+          {
+            "node": "Strategic Fit for EU/Germany Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt7": {
+      "main": [
+        [
+          {
+            "node": "Time To Market Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt8": {
+      "main": [
+        [
+          {
+            "node": "Team Strength Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Prompt9": {
+      "main": [
+        [
+          {
+            "node": "Risk vs. Return Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts1": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts2": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts3": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts4": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts5": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts6": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts7": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts8": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Prompts9": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Prompt9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Agent Outputs": {
+      "main": [
+        [
+          {
+            "node": "Merge Configs, Logic-Mill- And Agent Output",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Feasibility Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scalability Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Attractiveness Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competetive Advantage Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Economic and Societal Impact Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time To Market Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Strength Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk vs. Return Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data1": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data2": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data3": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data4": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data5": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data6": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data7": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data8": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Enrich and Format Data9": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs",
+            "type": "main",
+            "index": 9
+          }
+        ]
+      ]
+    },
+    "Scalability Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Attractiveness Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitive Advantage Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Economic and Societal Impact Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategic Fit for EU/Germany Agent": {
+      "main": [
+        [
+          {
+            "node": "Enrich and Format Data6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategic Fit for EU/Germany Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Time To Market Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Strength Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk vs. Return Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Merge Prompts9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Weight Configs": {
+      "main": [
+        [
+          {
+            "node": "Enrich Weight Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Weight Configs": {
+      "main": [
+        [
+          {
+            "node": "Merge Configs, Logic-Mill- And Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Configs, Logic-Mill- And Agent Output": {
+      "main": [
+        [
+          {
+            "node": "Calculate Weighted Average and Confidence Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Weighted Average and Confidence Scores": {
+      "main": [
+        [
+          {
+            "node": "Calculate Criteria Evaluation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Toltal Score and Overall Confidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Criteria Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Enrich Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude 4.1 Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orignality Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Feasibility Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Scalability Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Market Attractiveness Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Competetive Advantage Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Economic and Societal Impact Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Strategic Fit for EU/Germany Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Time To Market Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Team Strength Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Risk vs. Return Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "a511f41f-57b0-4511-bb82-7206222b8e0f",
+  "meta": {
+    "templateId": "ready-to-run-ai-workflow-v2",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc590e9501edc608182b5ddca78173b81472dc2c1b497a478f2c4c498d88f5ef"
+  },
+  "id": "Yhfyuw7jrZsstfY0",
+  "tags": []
+}
