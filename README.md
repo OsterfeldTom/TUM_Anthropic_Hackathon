@@ -20,7 +20,7 @@ By combining AI and semantic similarity search across the Max Planck research da
 
 ## Assessment Criteria
 
-The final Breakthrough Potential Score is calculated by weighting the following criteria, each rated on a scale from 1 to 5 (1 = strongest, 5 = weakest)
+The final Breakthrough Potential Score is calculated by weighting the following criteria, each rated on a scale from 1 to 5 (1 = strongest, 5 = weakest) (A detailed description of each scoring criterion is provided in the supplement below.)
 
 1. Novelty (empirical assessment using the Max Planck database)
 2. Feasability
@@ -32,6 +32,8 @@ The final Breakthrough Potential Score is calculated by weighting the following 
 8. Time to Market
 9. Team Strength
 10. Risk vs. Return
+
+> **Note:** Users can customize the weighting of each criterion to align with their specific goals or preferences
 
 
 #### Max Planck Research Database - Logic Mill API
