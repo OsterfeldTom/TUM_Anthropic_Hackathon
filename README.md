@@ -46,7 +46,7 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
 
 ## Demo
 
- See video
+ See video: https://www.youtube.com/watch?v=qPm4-AERC38
  
 ## Tech Stack
 
@@ -149,3 +149,4 @@ The evaluation of criteria 2–10 is performed by an advanced Claude-based AI ag
     - 3 = Some relevance.  
     - 4 = Minor.  
     - 5 = No relevance.  
+
